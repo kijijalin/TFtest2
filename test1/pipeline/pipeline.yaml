@@ -10,11 +10,29 @@ variables:
   serviceConnection: 'azure-cicd'
 
 stages:
+
+  # ---------------- INIT STAGE ----------------
   - stage: Init
+    displayName: Terraform Init
     jobs:
       - job: TerraformInit
+        displayName: Initialize Terraform
         steps:
           - checkout: self
+
+          # Temporary directory check
+          - bash: |
+              echo "Build Sources Directory:"
+              echo "$(Build.SourcesDirectory)"
+
+              echo "Repository folders:"
+              ls -la "$(Build.SourcesDirectory)"
+
+              echo "Terraform files:"
+              find "$(Build.SourcesDirectory)" -name "*.tf"
+            displayName: Check Repository Structure
+
+          # Terraform Init
           - bash: |
               set -e
               terraform version
@@ -23,12 +41,15 @@ stages:
             displayName: Terraform Init
             workingDirectory: '$(terraformDirectory)'
 
+  # ---------------- VALIDATE STAGE ----------------
   - stage: Validate
+    displayName: Terraform Validate
     dependsOn: Init
     jobs:
       - job: TerraformValidate
         steps:
           - checkout: self
+
           - bash: |
               set -e
               terraform init -input=false
@@ -36,18 +57,22 @@ stages:
             displayName: Terraform Validate
             workingDirectory: '$(terraformDirectory)'
 
+  # ---------------- PLAN STAGE ----------------
   - stage: Plan
+    displayName: Terraform Plan
     dependsOn: Validate
     jobs:
       - job: TerraformPlan
         steps:
           - checkout: self
+
           - task: TerraformTask@5
             displayName: Terraform Init
             inputs:
               provider: azurerm
               command: init
               workingDirectory: '$(terraformDirectory)'
+
           - task: TerraformTask@5
             displayName: Terraform Plan
             inputs:
@@ -57,18 +82,22 @@ stages:
               environmentServiceNameAzureRM: '$(serviceConnection)'
               commandOptions: '-input=false'
 
+  # ---------------- APPLY STAGE ----------------
   - stage: Apply
+    displayName: Terraform Apply
     dependsOn: Plan
     jobs:
       - job: TerraformApply
         steps:
           - checkout: self
+
           - task: TerraformTask@5
             displayName: Terraform Init
             inputs:
               provider: azurerm
               command: init
               workingDirectory: '$(terraformDirectory)'
+
           - task: TerraformTask@5
             displayName: Terraform Apply
             inputs:
