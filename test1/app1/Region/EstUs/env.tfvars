@@ -11,8 +11,8 @@ rg = {
     location = "Central India"
   }
 }
-  #  rg2 = {
-  #    rgname   = "Terraform"
-  #    location = "Central India"
-  #  }
-#}
+   rg2 = {
+     rgname   = "aks2"
+     location = "Central India"
+   }
+}

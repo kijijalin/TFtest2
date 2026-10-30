@@ -63,23 +63,29 @@ stages:
                 terraform init -input=false
                 terraform plan -input=false -var-file="env.tfvars"
 
+  
   # APPLY
   - stage: Apply
     displayName: Terraform Apply
     dependsOn: Plan
     jobs:
-      - job: TerraformApply
-        steps:
-          - checkout: self
+      - deployment: TerraformApply
+        displayName: Terraform Apply
+        environment: apply
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
 
-          - task: AzureCLI@2
-            displayName: Terraform Apply
-            inputs:
-              azureSubscription: '$(serviceConnection)'
-              scriptType: bash
-              scriptLocation: inlineScript
-              workingDirectory: '$(terraformDirectory)'
-              inlineScript: |
-                set -e
-                terraform init -input=false
-                terraform apply -input=false -auto-approve -var-file="env.tfvars"
+                - task: AzureCLI@2
+                  displayName: Terraform Apply
+                  inputs:
+                    azureSubscription: '$(serviceConnection)'
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    workingDirectory: '$(terraformDirectory)'
+                    inlineScript: |
+                      set -e
+                      terraform init -input=false
+                      terraform apply -input=false -auto-approve -var-file="env.tfvars"
