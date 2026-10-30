@@ -11,7 +11,7 @@ variables:
 
 stages:
 
-  # ---------------- INIT STAGE ----------------
+  # INIT
   - stage: Init
     displayName: Terraform Init
     jobs:
@@ -26,7 +26,7 @@ stages:
             displayName: Terraform Init
             workingDirectory: '$(terraformDirectory)'
 
-  # ---------------- VALIDATE STAGE ----------------
+  # VALIDATE
   - stage: Validate
     displayName: Terraform Validate
     dependsOn: Init
@@ -42,7 +42,7 @@ stages:
             displayName: Terraform Validate
             workingDirectory: '$(terraformDirectory)'
 
-  # ---------------- PLAN STAGE ----------------
+  # PLAN
   - stage: Plan
     displayName: Terraform Plan
     dependsOn: Validate
@@ -51,18 +51,19 @@ stages:
         steps:
           - checkout: self
 
-          - bash: |
-              set -e
-              terraform init -input=false
-              terraform plan -input=false -var-file="env.tfvars"
- #             export ARM_USE_CLI=true
-  #            terraform plan -input=false
+          - task: AzureCLI@2
             displayName: Terraform Plan
-            workingDirectory: '$(terraformDirectory)'
-            env:
-              ARM_USE_CLI: true
+            inputs:
+              azureSubscription: '$(serviceConnection)'
+              scriptType: bash
+              scriptLocation: inlineScript
+              workingDirectory: '$(terraformDirectory)'
+              inlineScript: |
+                set -e
+                terraform init -input=false
+                terraform plan -input=false -var-file="env.tfvars"
 
-  # ---------------- APPLY STAGE ----------------
+  # APPLY
   - stage: Apply
     displayName: Terraform Apply
     dependsOn: Plan
@@ -71,13 +72,14 @@ stages:
         steps:
           - checkout: self
 
-          - bash: |
-              set -e
-              terraform init -input=false
-              terraform apply -input=false -auto-approve -var-file="env.tfvars"
- #             export ARM_USE_CLI=true
- #             terraform apply -input=false -auto-approve
+          - task: AzureCLI@2
             displayName: Terraform Apply
-            workingDirectory: '$(terraformDirectory)'
-            env:
-              ARM_USE_CLI: true
+            inputs:
+              azureSubscription: '$(serviceConnection)'
+              scriptType: bash
+              scriptLocation: inlineScript
+              workingDirectory: '$(terraformDirectory)'
+              inlineScript: |
+                set -e
+                terraform init -input=false
+                terraform apply -input=false -auto-approve -var-file="env.tfvars"
