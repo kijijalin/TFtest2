@@ -7,12 +7,12 @@
 
 rg = {
   rg1 = {
-    rgname   = "rg-kiji1"
-    location = "East US"
+    rgname   = "AKS"
+    location = "Central India"
   }
-
-   rg2 = {
-     rgname   = "Terraform"
-     location = "Central India"
-   }
 }
+  #  rg2 = {
+  #    rgname   = "Terraform"
+  #    location = "Central India"
+  #  }
+#}
