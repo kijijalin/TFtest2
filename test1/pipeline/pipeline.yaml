@@ -6,7 +6,7 @@ pool:
   name: Default
 
 variables:
-  terraformDirectory: '$(Build.SourcesDirectory)/test1/app1/Region/EstUS'
+  terraformDirectory: '$(Build.SourcesDirectory)/test1/app1/Region/EstUs'
   serviceConnection: 'azure-cicd'
 
 stages:
@@ -30,13 +30,15 @@ stages:
 
               echo "Terraform files:"
               find "$(Build.SourcesDirectory)" -name "*.tf"
+
+              echo "Checking state directory:"
+              ls -la /mnt/statefile
             displayName: Check Repository Structure
 
           # Terraform Init
           - bash: |
               set -e
               terraform version
-              test -d /mnt/statefile
               terraform init -input=false
             displayName: Terraform Init
             workingDirectory: '$(terraformDirectory)'
