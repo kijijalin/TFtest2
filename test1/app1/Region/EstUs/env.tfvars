@@ -10,7 +10,7 @@ rg = {
     rgname   = "AKS"
     location = "Central India"
   }
-}
+
    rg2 = {
      rgname   = "aks2"
      location = "Central India"
